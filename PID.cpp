@@ -104,7 +104,7 @@ int main (int argc, char *argv[])
 	signal(SIGINT, &trap);
     struct timespec te;
     int address;
-    int mag,imu;
+    int mag; //,imu;
     int data;
 	// int display;
     int roll_pos_pwm=PWM_NEUTRAL;
@@ -115,42 +115,29 @@ int main (int argc, char *argv[])
 
     wiringPiSetup () ;
 
-    // gyro init 
+     
     long time_curr=0;
     long time_prev=0;
-    double delta_roll_gyro=0;
-    double delta_pitch_gyro=0;
-    double yaw_gyro = 0;
-
-    long int x_offset = 0;
-    long int y_offset = 0;
-    long int z_offset = 0;
-
-    // acc init
-    double pitch_acc = 0;
-    double roll_acc = 0;
-
     float diff;
-
-    // complimentary filter
-    double roll  = 0;
-    double roll_prev = 0;
     double pitch_prev = 0;
-    double pitch = 0;
     double d_pitch = 0;
 
+    // filter gain
     double A= 0.02;
 
     // p controller gain
     int P = 0;
     int D = 500;
+    
     // error condition
     bool imu_limit = 0;
     bool timeout = 0;
 
     //setup for pwm
-    pwm=wiringPiI2CSetup (0x40);  //connect pwm board to imu
-    imu=wiringPiI2CSetup (0x6B) ; //accel/gyro address
+    pwm=wiringPiI2CSetup (0x40);  
+    IMU imu;
+
+//    imu=wiringPiI2CSetup (0x6B) ; //accel/gyro address
 
     // check i2c connections
     if(imu==-1||pwm==-1)
@@ -162,8 +149,6 @@ int main (int argc, char *argv[])
     {
         //init pwm , imu and motors
         init_pwm(pwm);
-        init_imu(imu,x_offset, y_offset, z_offset);     
-
         init_motor(pwm,3);
         init_motor(pwm,2);
         init_motor(pwm,1);
@@ -187,20 +172,15 @@ int main (int argc, char *argv[])
             //convert to seconds
             diff=diff/1000000000;
 
-            gyro_measure(imu, delta_roll_gyro, delta_pitch_gyro, yaw_gyro, x_offset, y_offset, z_offset, diff);
-            
-            accel_measure(imu, roll_acc, pitch_acc);   //compute amount of rotation since last execution
-            
-            comp_filter(A, delta_roll_gyro,  roll_acc,  roll);
-            comp_filter(A, delta_pitch_gyro, pitch_acc, pitch);
-            imu_limit = imu_error(pitch, roll, double(IMU_CUTOFF));
-            
-            // derivative term
-            d_pitch = pitch - pitch_prev;
-            pitch_prev = pitch;
+            imu_limit = imu.measure(diff, A, IMU_CUTOFF);
 
-            pitch_pos_pwm = PWM_NEUTRAL + d_pitch * D - pitch*P;
-            pitch_neg_pwm = PWM_NEUTRAL - d_pitch * D + pitch*P;
+            // derivative term
+            d_pitch = imu.pitch_ - pitch_prev;
+            
+            pitch_prev = imu.pitch_;
+
+            pitch_pos_pwm = PWM_NEUTRAL + d_pitch * D - imu.pitch_*P;
+            pitch_neg_pwm = PWM_NEUTRAL - d_pitch * D + imu.pitch_*P;
             
             pitch_pos_pwm= (pitch_pos_pwm>=PWM_MAX) ? (PWM_MAX):(pitch_pos_pwm);
             pitch_neg_pwm= (pitch_neg_pwm<=PWM_MAX) ? (PWM_MAX):(pitch_neg_pwm);
@@ -209,8 +189,8 @@ int main (int argc, char *argv[])
 
 
             // cap on roll PWM 
-            roll_pos_pwm= ((PWM_NEUTRAL - roll*P)>=PWM_MAX) ? (PWM_MAX):(PWM_NEUTRAL - roll*P);
-            roll_neg_pwm= ((PWM_NEUTRAL + roll*P)>=PWM_MAX) ? (PWM_MAX):(PWM_NEUTRAL + roll*P);
+            // roll_pos_pwm= ((PWM_NEUTRAL - roll*P)>=PWM_MAX) ? (PWM_MAX):(PWM_NEUTRAL - roll*P);
+            // roll_neg_pwm= ((PWM_NEUTRAL + roll*P)>=PWM_MAX) ? (PWM_MAX):(PWM_NEUTRAL + roll*P);
 
             // pitch_pos_pwm= ((PWM_NEUTRAL - pitch*P)>=PWM_MAX) ? (PWM_MAX):(PWM_NEUTRAL - pitch*P);
             // pitch_neg_pwm= ((PWM_NEUTRAL + pitch*P)>=PWM_MAX) ? (PWM_MAX):(PWM_NEUTRAL + pitch*P);

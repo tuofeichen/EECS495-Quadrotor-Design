@@ -85,7 +85,8 @@ void gyro_measure(int imu, double& delta_roll_gyro, double& delta_pitch_gyro, do
     x_angle_dps = x_rate*((double)500/32767);
     y_angle_dps = y_rate*((double)500/32767);
     z_angle_dps = z_rate*((double)500/32767);
- //compute amount of rotation since last execution
+
+    //compute amount of rotation since last execution
     delta_roll_gyro  = x_angle_dps*diff;
     delta_pitch_gyro = y_angle_dps*diff;
     
