@@ -13,6 +13,7 @@ In this advanced mechatronics class, we aimed to code up a controller for a quad
     ii. Wiring Schematic
     ![Alt text](imu.png?raw=true "Optional Title")
 
+
   
   
   b. Software
