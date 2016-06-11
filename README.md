@@ -9,7 +9,7 @@ In this advanced mechatronics class, we aimed to code up a controller for a quad
   a. Hardware
     i. Overall fixture 
 
-    ![Alt text](Quad.png?raw=true "Optional Title")
+    ![Alt text](Quad.jpg?raw=true "Optional Title")
 
     ii. Wiring Schematic
   
