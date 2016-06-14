@@ -8,7 +8,7 @@ EECS495 Quadrotor Desgin
 ##2. Sytem Setup
 ###a. Hardware
 ####i. Overall fixture 
-![Alt text](QC.png?raw=true "Optional Title")
+![Alt text](Quad.jpg?raw=true "Optional Title")
 
 ####ii. Wiring Schematic
 ![Alt text](imu.png?raw=true "Optional Title")
