@@ -9,7 +9,6 @@ EECS495 Quadrotor Desgin
 ###a. Hardware
 ####i. Overall fixture 
 ![Alt text](Quad.jpg?raw=true "Optional Title")
-
 ####ii. Wiring Schematic
 ![Alt text](imu.png?raw=true "Optional Title")
 
